@@ -1,4 +1,4 @@
-A simple visualization of COVID-19 cases in the USA using Mapbox and APIs from: https://github.com/mathdroid/covid-19-api
+### A simple visualization of COVID-19 cases in the USA using Mapbox and APIs from: https://github.com/mathdroid/covid-19-api
 
 ## Available Scripts
 
