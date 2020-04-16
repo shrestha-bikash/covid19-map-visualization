@@ -2,11 +2,10 @@ import axios from 'axios';
 import { getGeosonData } from '../data';
 
 // url = 'https://corona.lmao.ninja/countries';
-const url = "https://covid19.mathdro.id/api/countries/USA/confirmed";
 
-export const fetchData = async (country) => {
+export const fetchData = async (type = 'confirmed', country = 'USA') => {
   let response;
-
+  let url = `https://covid19.mathdro.id/api/countries/${country}/${type}`;
   try {
     response = await axios.get(url);
     console.log('response', response);

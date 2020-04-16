@@ -3,7 +3,9 @@ import './App.css';
 import ReactMapboxGl, { GeoJSONLayer } from 'react-mapbox-gl';
 import * as MapboxGL from 'mapbox-gl';
 import { fetchData } from './api';
+import {  Select } from 'antd';
 
+const { Option } = Select;
 
 const Map = ReactMapboxGl({
   accessToken:
@@ -11,46 +13,83 @@ const Map = ReactMapboxGl({
     
 });
 
-const symbolLayout: MapboxGL.SymbolLayout = {
-  'text-field': '{place}',
-  'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-  'text-offset': [0, 0.6],
-  'text-anchor': 'top'
-};
-const symbolPaint: MapboxGL.SymbolPaint = {
-  'text-color': 'white'
-};
-
-const circleLayout: MapboxGL.CircleLayout = { visibility: 'visible' };
-const circlePaint: MapboxGL.CirclePaint = {
-  'circle-radius': ['round', ['log2', ['+', 1, ['number', ['get', 'deaths'], 0]]]],
-  'circle-color': 'red',
-  'circle-opacity': 0.8,
-  'circle-stroke-width': 1,
-  'circle-stroke-color': '#333',
-};
-
-const onClickCircle = (evt) => {
-  console.log(evt);
-};
-
 function App() {
   const [geodata, setgeodata] = useState(null);
+  const [selectedMethod, setMethod] = useState({
+    method: 'confirmed',
+    color: 'yellow'
+  });
 
-  useEffect(() => {
-    async function getdata() {
-      const data = await fetchData();
-      // const stateData = fetchDataStatewise();
-      // console.log('in App', data);
-      if(data){ 
-        setgeodata(data);
-      }
+  const symbolLayout: MapboxGL.SymbolLayout = {
+    'text-field': '{place}',
+    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+    'text-offset': [0, 0.6],
+    'text-anchor': 'top'
+  };
+  const symbolPaint: MapboxGL.SymbolPaint = {
+    'text-color': 'white'
+  };
+  
+  const circleLayout: MapboxGL.CircleLayout = { visibility: 'visible' };
+  const circlePaint: MapboxGL.CirclePaint = {
+    'circle-radius': ['round', ['log2', ['+', 1, ['number', ['get', selectedMethod.method], 0]]]],
+    'circle-color': selectedMethod.color,
+    'circle-opacity': 0.8,
+    'circle-stroke-width': 1,
+    'circle-stroke-color': '#333',
+  };
+
+  async function getdata(...args) {
+    console.log('args', ...args);
+    const data = await fetchData(...args);
+    if(data){ 
+      setgeodata(data);
     }
+  }
+
+  useEffect(() => { 
     getdata();
     
   }, []);
 
   console.log('geodata', geodata);
+
+  const onClickCircle = (evt) => {
+    console.log(evt);
+  };
+  
+  const handleChange = (val) => {
+    console.log(val);
+    let newState = {};
+
+    if(val === 'active') {
+      newState = {
+        method: val,
+        color: 'orange'
+      }
+    }
+    else if(val === 'deaths') {
+      newState = {
+        method: val,
+        color: 'red'
+      }
+    }
+    else if(val === 'recovered') {
+      getdata(val);
+      newState = {
+        method: val,
+        color: 'green'
+      }
+    }
+    else {
+      newState = {
+        method: val,
+        color: 'yellow'
+      }
+    }
+
+    setMethod(newState);
+  }
 
   return (
     <div className="App">
@@ -61,30 +100,26 @@ function App() {
             height: '100vh',
             width: '100vw'
           }}
-          center = {[-90.30356, 38.6586022]}
-          zoom = {['3.5']}
+          center = {[-102.845452, 40.149178]}
+          zoom = {['3.7']}
         >
           <GeoJSONLayer
             data={geodata}
             circleLayout={circleLayout}
             circlePaint={circlePaint}
-            circleOnClick={(e) => onClickCircle(e)}
+            circleOnClick={onClickCircle}
             symbolLayout={symbolLayout}
             symbolPaint={symbolPaint}
           />
 
-          {/* <Layer type="symbol" id="marker" layout={{ 'icon-image': 'marker-15' }}>
-            {
-              geodata && geodata.features.map((feature) =>
-                <Feature 
-                  key={feature.properties.country} 
-                  coordinates={[feature.geometry.coordinates[0], feature.geometry.coordinates[1]]} 
-                />
-              )
-            }
-          </Layer> */}
         </Map>
 
+        <Select defaultValue="confirmed" className="select-btn" style={{ width: 120 }} onChange={handleChange}>
+          <Option value="confirmed">Total Cases</Option>
+          <Option value="active">Active Cases</Option>
+          <Option value="deaths">Deaths</Option>
+          {/* <Option value="recovered">Recovered</Option> */}
+        </Select>
       </header>
     </div>
   );

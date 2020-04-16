@@ -1,3 +1,5 @@
+@import '~antd/dist/antd.css';
+
 .App {
   text-align: center;
 }
@@ -26,6 +28,12 @@
 
 .App-link {
   color: #61dafb;
+}
+
+.select-btn {
+  position: absolute;
+  top: 5%;
+  left: 5%;
 }
 
 @keyframes App-logo-spin {

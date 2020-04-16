@@ -6,12 +6,12 @@ export const getGeosonData = (response) => {
 
     const geoJson = {
         type: 'FeatureCollection',
-        features: data.map((country = {}) => {
-            const { lat, long: lng } = country;
+        features: data.map((values = {}) => {
+            const { lat, long: lng } = values;
             return {
                 type: 'Feature',
                 properties: {
-                    ...country,
+                    ...values,
                 },
                 geometry: {
                     type: 'Point',
