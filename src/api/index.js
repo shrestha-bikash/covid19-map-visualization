@@ -3,12 +3,32 @@ import { getGeosonData } from '../data';
 
 // url = 'https://corona.lmao.ninja/countries';
 
+export const fetchCountOnly = async (country = 'USA') => {
+  let response;
+  let url = `https://covid19.mathdro.id/api/countries/${country}`;
+  try {
+    response = await axios.get(url);
+  } catch(e) {
+    console.log(`Failed to fetch countries: ${e.message}`, e);
+    return;
+  }
+
+  const { data = {} } = response;
+  const count = {
+    confirmed: data.confirmed.value,
+    deaths: data.deaths.value,
+    recovered: data.recovered.value
+  }
+
+  return count;
+}
+
 export const fetchData = async (type = 'confirmed', country = 'USA') => {
   let response;
   let url = `https://covid19.mathdro.id/api/countries/${country}/${type}`;
   try {
     response = await axios.get(url);
-    console.log('response', response);
+    // console.log('response', response);
   } catch(e) {
     console.log(`Failed to fetch countries: ${e.message}`, e);
     return;

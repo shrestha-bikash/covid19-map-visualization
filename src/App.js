@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import ReactMapboxGl, { GeoJSONLayer, Popup } from 'react-mapbox-gl';
 import * as MapboxGL from 'mapbox-gl';
-import { fetchData } from './api';
-import {  Select } from 'antd';
+import { fetchData, fetchCountOnly } from './api';
+import {  Select, Tag } from 'antd';
 
 const { Option } = Select;
 
@@ -14,6 +14,7 @@ const Map = ReactMapboxGl({
 });
 
 function App() {
+  const [stat, setStat] = useState(null);
   const [geodata, setgeodata] = useState(null);
   const [selectedMethod, setMethod] = useState({
     method: 'confirmed',
@@ -51,8 +52,15 @@ function App() {
     }
   }
 
+  async function getStat() {
+    const data = await fetchCountOnly();
+    console.log('data', data);
+    setStat(data);
+  }
+
   useEffect(() => { 
     getdata();
+    getStat();
     
   }, []);
 
@@ -156,6 +164,27 @@ function App() {
           <Option value="deaths">Deaths</Option>
           {/* <Option value="recovered">Recovered</Option> */}
         </Select>
+        {
+          stat ? (
+            <div className='custom-tag'>
+              <Tag color="gold">
+                <p>Confirmed</p>
+                {stat.confirmed}
+              </Tag>
+              <Tag color="red">
+                <p>Deaths</p>
+                {stat.deaths}
+                </Tag>
+              <Tag color="green">
+                <p>Recovered</p>
+                {stat.recovered}
+                </Tag>
+            </div>
+          ) : null
+        }
+        
+        
+
       </header>
     </div>
   );
