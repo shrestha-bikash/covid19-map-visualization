@@ -36,6 +36,15 @@
   left: 5%;
 }
 
+.mapboxgl-popup-content {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+.mapboxgl-popup-content h3, .mapboxgl-popup-content h4 {
+  margin-bottom: 0.25em;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import ReactMapboxGl, { GeoJSONLayer } from 'react-mapbox-gl';
+import ReactMapboxGl, { GeoJSONLayer, Popup } from 'react-mapbox-gl';
 import * as MapboxGL from 'mapbox-gl';
 import { fetchData } from './api';
 import {  Select } from 'antd';
@@ -18,6 +18,11 @@ function App() {
   const [selectedMethod, setMethod] = useState({
     method: 'confirmed',
     color: 'yellow'
+  });
+  const [clickedValue, setValue] = useState(null);
+  let [viewport, setViewport] = useState({
+    center: [-102.845452, 40.149178],       
+    zoom: ['3.7']
   });
 
   const symbolLayout: MapboxGL.SymbolLayout = {
@@ -40,7 +45,6 @@ function App() {
   };
 
   async function getdata(...args) {
-    console.log('args', ...args);
     const data = await fetchData(...args);
     if(data){ 
       setgeodata(data);
@@ -52,14 +56,26 @@ function App() {
     
   }, []);
 
-  console.log('geodata', geodata);
 
-  const onClickCircle = (evt) => {
-    console.log(evt);
+  const onClickCircle = (e) => {
+    e.preventDefault();
+
+    let regionName = e.features[0].properties.combinedKey;
+    let value = e.features[0].properties[selectedMethod.method];
+    // console.log(regionName, value);
+
+    let targetValue = {
+      lng: e.lngLat.lng,
+      lat: e.lngLat.lat,
+      region: regionName,
+      count: value
+    }
+    setValue(targetValue);
   };
   
   const handleChange = (val) => {
-    console.log(val);
+    // console.log(val);
+    setValue(null);
     let newState = {};
 
     if(val === 'active') {
@@ -100,8 +116,13 @@ function App() {
             height: '100vh',
             width: '100vw'
           }}
-          center = {[-102.845452, 40.149178]}
-          zoom = {['3.7']}
+          {...viewport}
+          onZoomEnd={e => {
+            setViewport({
+              zoom: [e.getZoom()],
+              center: [e.getCenter().lng, e.getCenter().lat]
+            })
+          }}
         >
           <GeoJSONLayer
             data={geodata}
@@ -111,6 +132,21 @@ function App() {
             symbolLayout={symbolLayout}
             symbolPaint={symbolPaint}
           />
+          {
+            clickedValue ? (
+              <Popup
+                coordinates={[clickedValue.lng, clickedValue.lat]}
+                onClick={() => {
+                  setValue(null);
+                }}
+              >
+                <div>
+                  <h3>{clickedValue.region}</h3>
+                  <h4>{clickedValue.count}</h4>
+                </div>
+              </Popup>
+            ) : null
+          }
 
         </Map>
 
