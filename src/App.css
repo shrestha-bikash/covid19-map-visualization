@@ -35,6 +35,10 @@
   top: 5%;
   left: 5%;
 }
+
+.ant-select {
+  margin: 0.5em;
+}
 .custom-tag {
   position: absolute;
   bottom: 11%;

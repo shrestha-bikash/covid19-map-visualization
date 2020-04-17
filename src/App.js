@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import ReactMapboxGl, { GeoJSONLayer, Popup } from 'react-mapbox-gl';
 import * as MapboxGL from 'mapbox-gl';
-import { fetchData, fetchCountOnly } from './api';
+import { fetchData, fetchCountOnly, fetchCountriesList } from './api';
 import {  Select, Tag } from 'antd';
 
 const { Option } = Select;
@@ -15,6 +15,7 @@ const Map = ReactMapboxGl({
 
 function App() {
   const [stat, setStat] = useState(null);
+  const [countries, setCountry] = useState(null);
   const [geodata, setgeodata] = useState(null);
   const [selectedMethod, setMethod] = useState({
     method: 'confirmed',
@@ -45,22 +46,46 @@ function App() {
     'circle-stroke-color': '#333',
   };
 
+  async function getCountries() {
+    const data = await fetchCountriesList();
+    if(data){
+      const { countries = [] } = data;
+      // console.log('countries', countries);
+      setCountry(countries);
+    }
+  }
+
   async function getdata(...args) {
+    let country = args[0];
+    getStat(country);
     const data = await fetchData(...args);
     if(data){ 
+      // console.log('data', data.features);
+      if(data.features.length > 0 && country !== 'US') {
+          setViewport({
+            zoom: ['4'],
+            center: data.features[0].geometry.coordinates
+          })
+      }
+      else {
+        setViewport({
+          center: [-102.845452, 40.149178],       
+            zoom: ['3.7']
+        });
+      }
       setgeodata(data);
     }
   }
 
-  async function getStat() {
-    const data = await fetchCountOnly();
-    console.log('data', data);
+  async function getStat(country) {
+    const data = await fetchCountOnly(country);
+    // console.log('data', data);
     setStat(data);
   }
 
   useEffect(() => { 
-    getdata();
-    getStat();
+    getCountries();
+    getdata('US');
     
   }, []);
 
@@ -115,6 +140,10 @@ function App() {
     setMethod(newState);
   }
 
+  const handleCountryChange = (val) => {
+    getdata(val);
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -150,20 +179,41 @@ function App() {
               >
                 <div>
                   <h3>{clickedValue.region}</h3>
-                  <h4>{clickedValue.count}</h4>
+                  <h4>{selectedMethod.method.toUpperCase()}: {clickedValue.count}</h4>
                 </div>
               </Popup>
             ) : null
           }
 
         </Map>
+        
+        <div className="select-btn">
+        <Select
+          showSearch
+          optionFilterProp="children"
+          filterOption={(input, option) =>
+            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
+          defaultValue="US" 
+          style={{ width: 140 }} 
+          onChange={handleCountryChange}
+          >
+            {
+              countries && countries.length > 0 ? countries.map((item) => 
+                <Option key={item.name} value={item.name}>{item.name}</Option>
+              ) : null
+            }
+          </Select>
+          <Select defaultValue="confirmed" style={{ width: 120 }} onChange={handleChange}>
+            <Option value="confirmed">Total Cases</Option>
+            <Option value="active">Active Cases</Option>
+            <Option value="deaths">Deaths</Option>
+            {/* <Option value="recovered">Recovered</Option> */}
+          </Select>
+        </div>
+        
 
-        <Select defaultValue="confirmed" className="select-btn" style={{ width: 120 }} onChange={handleChange}>
-          <Option value="confirmed">Total Cases</Option>
-          <Option value="active">Active Cases</Option>
-          <Option value="deaths">Deaths</Option>
-          {/* <Option value="recovered">Recovered</Option> */}
-        </Select>
+        
         {
           stat ? (
             <div className='custom-tag'>
