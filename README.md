@@ -1,4 +1,4 @@
-### A simple visualization of COVID-19 cases in the USA using Mapbox and APIs from: https://github.com/mathdroid/covid-19-api
+### A simple visualization of COVID-19 cases using Mapbox and APIs from: https://github.com/mathdroid/covid-19-api
 
 ## Available Scripts
 
@@ -27,8 +27,5 @@ Your app is ready to be deployed!
 
 ### Deployment
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+Using `npm run deploy` which use `gh-pages`
 
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
