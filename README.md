@@ -1,4 +1,6 @@
-### A simple visualization of COVID-19 cases using Mapbox and APIs from: https://github.com/mathdroid/covid-19-api
+### Visit: https://shrestha-bikash.github.io/covid19-map-visualization/
+
+## A simple visualization of COVID-19 cases using Mapbox and APIs from: https://github.com/mathdroid/covid-19-api
 
 ## Available Scripts
 
